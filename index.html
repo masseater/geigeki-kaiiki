@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>迎撃海域</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@700;800&family=Zen+Kaku+Gothic+New:wght@500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+</head>
+<body>
+<div id="game">
+  <canvas id="c" aria-label="海戦画面"></canvas>
+  <canvas id="fx"></canvas>
+
+  <div class="hud card" id="mission">
+    <div class="wave" id="waveLabel">出撃準備</div>
+    <div class="row"><span class="label">残存敵艦</span><span class="mono" id="enemyCount">0</span></div>
+    <div class="row"><span class="label">作戦時間</span><span class="mono" id="clock">00:00</span></div>
+    <div class="row"><span class="label">目標</span><span class="mono" id="lockLabel">—</span></div>
+    <div class="tools"><button class="iconbtn" id="muteBtn">音 あり</button><button class="iconbtn" id="zoomBtn">視点 中</button></div>
+  </div>
+
+  <div class="hud card" id="radarWrap"><canvas id="radar" width="300" height="300"></canvas></div>
+
+  <div class="hud" id="log"></div>
+  <div class="hud" id="alarm" hidden></div>
+
+  <div class="hud card" id="status">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+      <span class="shipname" id="shipName">—</span>
+      <span class="mono" id="hpText">0 / 0</span>
+    </div>
+    <div class="bar"><i id="hpBar" style="width:100%"></i></div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <span class="label">機関</span><span class="mono" id="kt">0 kt</span>
+    </div>
+    <div id="telegraph"></div>
+  </div>
+
+  <div class="hud card" id="weapons">
+    <div class="weap"><span>主砲</span><div class="bar" id="gunBarW"><i id="gunBar"></i></div><span class="k">左クリック</span></div>
+    <div class="weap" id="torpRow"><span>魚雷</span><div class="bar" id="torpBarW"><i id="torpBar"></i></div><span class="k">F</span></div>
+    <div class="weap"><span>応急修理</span><div class="bar" id="repBarW"><i id="repBar"></i></div><span class="k" id="repLeft">R ×2</span></div>
+  </div>
+
+  <div id="touch">
+    <button class="tbtn" data-act="up" style="left:calc(env(safe-area-inset-left,0px) + 76px);bottom:calc(env(safe-area-inset-bottom,0px) + 82px)">増速</button>
+    <button class="tbtn" data-act="down" style="left:calc(env(safe-area-inset-left,0px) + 76px);bottom:calc(env(safe-area-inset-bottom,0px) + 16px)">減速</button>
+    <button class="tbtn" data-act="left" style="left:calc(env(safe-area-inset-left,0px) + 14px);bottom:calc(env(safe-area-inset-bottom,0px) + 50px)">取舵</button>
+    <button class="tbtn" data-act="right" style="left:calc(env(safe-area-inset-left,0px) + 138px);bottom:calc(env(safe-area-inset-bottom,0px) + 50px)">面舵</button>
+    <button class="tbtn" data-act="fire" style="right:calc(env(safe-area-inset-right,0px) + 16px);bottom:calc(env(safe-area-inset-bottom,0px) + 40px);width:72px;height:72px">主砲</button>
+    <button class="tbtn" data-act="torp" style="right:calc(env(safe-area-inset-right,0px) + 100px);bottom:calc(env(safe-area-inset-bottom,0px) + 16px)">魚雷</button>
+    <button class="tbtn" data-act="target" style="right:calc(env(safe-area-inset-right,0px) + 24px);bottom:calc(env(safe-area-inset-bottom,0px) + 124px)">目標</button>
+    <button class="tbtn" data-act="zoom" style="right:calc(env(safe-area-inset-right,0px) + 100px);bottom:calc(env(safe-area-inset-bottom,0px) + 152px)">視点</button>
+    <button class="tbtn" data-act="repair" style="right:calc(env(safe-area-inset-right,0px) + 100px);bottom:calc(env(safe-area-inset-bottom,0px) + 84px)">修理</button>
+  </div>
+
+  <div id="overlay">
+    <div class="sheet" id="sheet"></div>
+  </div>
+</div>
+
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

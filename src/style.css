@@ -1,0 +1,110 @@
+/* 全画面の3D俯瞰海面。HUDは四隅に計器として置き、出撃前と結果は海図台のような中央パネルで出す */
+:root {
+  color-scheme: dark;
+  --sea: #0f2430;
+  --panel: rgba(9, 20, 27, 0.86);
+  --panel-line: #2c4654;
+  --ink: #e4e8e3;
+  --ink-dim: #93a3a8;
+  --brass: #d6a84a;
+  --brass-dim: #8a6c33;
+  --ally: #8fc6d9;
+  --enemy: #e0614a;
+  --good: #7fc28a;
+  --warn: #e3b545;
+  --display: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+html, body { height: 100%; }
+body { background: var(--sea); color: var(--ink); font-family: var(--body); overflow: hidden; }
+#game { position: fixed; inset: 0; user-select: none; -webkit-user-select: none; touch-action: none; }
+#c { display: block; width: 100%; height: 100%; cursor: crosshair; }
+
+.hud { position: absolute; pointer-events: none; font-variant-numeric: tabular-nums; }
+.card { background: var(--panel); border: 1px solid var(--panel-line); border-radius: 4px; padding: 10px 12px; }
+.label { font-size: 10px; letter-spacing: 0.14em; color: var(--ink-dim); }
+.mono { font-family: var(--mono); }
+
+#mission { top: calc(env(safe-area-inset-top, 0px) + 12px); left: calc(env(safe-area-inset-left, 0px) + 12px); display: grid; gap: 6px; min-width: 170px; }
+#mission .wave { font-family: var(--display); font-size: 18px; color: var(--brass); }
+#mission .row { display: flex; justify-content: space-between; gap: 16px; font-size: 13px; }
+
+#radarWrap { top: calc(env(safe-area-inset-top, 0px) + 12px); right: calc(env(safe-area-inset-right, 0px) + 12px); padding: 6px; }
+#radar { display: block; width: 150px; height: 150px; }
+
+#status { bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); left: calc(env(safe-area-inset-left, 0px) + 12px); display: grid; gap: 8px; width: 250px; }
+.shipname { font-family: var(--display); font-size: 15px; }
+.bar { height: 8px; background: #1d2f38; border-radius: 2px; overflow: hidden; }
+.bar > i { display: block; height: 100%; background: var(--good); transition: width 0.15s linear; }
+#telegraph { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; }
+#telegraph span { font-size: 10px; text-align: center; padding: 3px 0; background: #13232b; color: var(--ink-dim); border-radius: 2px; }
+#telegraph span.on { background: var(--brass); color: #1a1408; font-weight: 700; }
+#telegraph span.rev.on { background: var(--enemy); color: #fff; }
+
+#weapons { bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); right: calc(env(safe-area-inset-right, 0px) + 12px); display: grid; gap: 8px; width: 240px; }
+.weap { display: grid; grid-template-columns: 56px 1fr auto; align-items: center; gap: 8px; font-size: 12px; }
+.weap .bar > i { background: var(--brass); }
+.weap .bar.ready > i { background: var(--good); }
+.weap .k { font-family: var(--mono); font-size: 11px; color: var(--ink-dim); text-align: right; white-space: nowrap; }
+
+#log { top: calc(env(safe-area-inset-top, 0px) + 14px); left: 50%; transform: translateX(-50%); display: grid; gap: 4px; justify-items: center; width: min(460px, 60vw); }
+#log div { background: rgba(9, 20, 27, 0.78); border-left: 3px solid var(--brass); padding: 5px 12px; font-size: 13px; animation: logIn 0.25s ease-out; }
+#log div.bad { border-left-color: var(--enemy); }
+#log div.big { font-family: var(--display); font-size: 20px; border-left-color: var(--enemy); color: #ffd9cf; }
+@keyframes logIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+#touch { position: absolute; inset: auto 0 0 0; pointer-events: none; display: none; }
+.touch-on #touch { display: block; }
+.tbtn { pointer-events: auto; position: absolute; width: 56px; height: 56px; border-radius: 50%; background: rgba(9, 20, 27, 0.72); border: 1px solid var(--panel-line); color: var(--ink); font-family: var(--body); font-weight: 700; font-size: 13px; display: grid; place-items: center; touch-action: none; }
+.tbtn:active, .tbtn.held { background: var(--brass); color: #1a1408; }
+
+#overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(6, 14, 19, 0.55); padding-block: calc(env(safe-area-inset-top, 0px) + 16px) calc(env(safe-area-inset-bottom, 0px) + 16px); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); overflow-y: auto; }
+#overlay[hidden] { display: none !important; }
+.sheet { width: min(720px, 100%); background: var(--panel); border: 1px solid var(--panel-line); border-radius: 6px; padding: 24px; display: grid; gap: 18px; }
+.sheet h1 { margin: 0; font-family: var(--display); font-weight: 800; font-size: clamp(32px, 6vw, 48px); letter-spacing: 0.12em; color: var(--ink); text-wrap: balance; }
+.sheet .order { margin: 0; color: var(--ink-dim); font-size: 14px; line-height: 1.8; max-width: 60ch; }
+.sheet .order b { color: var(--brass); font-weight: 700; }
+.designs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.design { text-align: left; background: #0d1b22; border: 1px solid var(--panel-line); border-radius: 4px; padding: 12px; color: var(--ink); font-family: var(--body); cursor: pointer; display: grid; gap: 6px; min-width: 0; }
+.design:focus-visible, .go:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.design[aria-pressed="true"] { border-color: var(--brass); box-shadow: inset 0 0 0 1px var(--brass); }
+.design .n { font-family: var(--display); font-size: 16px; }
+.design .t { font-size: 11px; color: var(--ink-dim); letter-spacing: 0.08em; }
+.design dl { margin: 4px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; font-size: 12px; }
+.design dt { color: var(--ink-dim); }
+.design dd { margin: 0; font-family: var(--mono); }
+.keys { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 18px; font-size: 13px; color: var(--ink-dim); }
+.keys kbd { font-family: var(--mono); font-size: 11px; color: var(--ink); background: #1b2c35; border: 1px solid var(--panel-line); border-radius: 3px; padding: 1px 5px; margin-right: 6px; }
+.go { justify-self: start; background: var(--brass); color: #1a1408; border: 0; border-radius: 4px; padding: 12px 28px; font-family: var(--display); font-weight: 800; font-size: 18px; letter-spacing: 0.2em; cursor: pointer; }
+.result-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.result-grid div { background: #0d1b22; border: 1px solid var(--panel-line); border-radius: 4px; padding: 10px 12px; display: grid; gap: 4px; }
+.result-grid strong { font-family: var(--mono); font-size: 22px; }
+.rank { font-family: var(--display); font-size: 56px; line-height: 1; color: var(--brass); }
+
+#fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+#alarm { top: calc(env(safe-area-inset-top, 0px) + 170px); left: 50%; transform: translateX(-50%); background: rgba(118, 24, 14, 0.9); border: 1px solid var(--enemy); color: #fff; font-family: var(--display); font-size: 20px; letter-spacing: 0.08em; padding: 6px 18px; border-radius: 3px; white-space: nowrap; }
+#alarm.blink { animation: blink 0.6s steps(2, jump-none) infinite; }
+@keyframes blink { 50% { background: rgba(224, 97, 74, 0.95); } }
+.tools { display: flex; gap: 6px; margin-top: 2px; }
+.iconbtn { pointer-events: auto; background: #13232b; border: 1px solid var(--panel-line); color: var(--ink-dim); font-family: var(--body); font-size: 11px; border-radius: 3px; padding: 3px 8px; cursor: pointer; }
+.iconbtn:focus-visible { outline: 2px solid var(--brass); outline-offset: 1px; }
+.tips { margin: 0; padding-left: 1.2em; color: var(--ink-dim); font-size: 13px; line-height: 1.75; display: grid; gap: 2px; }
+.tips b { color: var(--ink); font-weight: 700; }
+
+@media (max-width: 640px) {
+  #status { width: 176px; padding: 8px; gap: 5px; }
+  #status .shipname { display: none; }
+  #telegraph span { font-size: 9px; padding: 2px 0; }
+  #weapons { display: none; }
+  #radar { width: 104px; height: 104px; }
+  #mission { min-width: 0; padding: 8px; }
+  #log { width: 70vw; top: calc(env(safe-area-inset-top, 0px) + 150px); }
+  #alarm { top: calc(env(safe-area-inset-top, 0px) + 250px); font-size: 17px; }
+  .designs { grid-template-columns: 1fr; }
+  .keys { grid-template-columns: 1fr; }
+  .sheet { padding: 18px; }
+}
+.touch-on #status { bottom: calc(env(safe-area-inset-bottom, 0px) + 150px); }
+.touch-on #weapons { display: none; }
+@media (prefers-reduced-motion: reduce) { #log div, #alarm.blink { animation: none; } }
