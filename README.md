@@ -1,5 +1,7 @@
 # 迎撃海域
 
+遊ぶ: https://geigeki-kaiiki.masseater.dev/
+
 3D俯瞰のリアルタイム海戦ゲーム。自艦1隻で三波に分かれて来る敵艦隊と超兵器を沈める。
 
 ```sh

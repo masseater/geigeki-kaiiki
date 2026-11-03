@@ -24,7 +24,7 @@
 
 ## 公開
 
-main に push すると GitHub Pages（https://masseater.github.io/geigeki-kaiiki/）へ自動で公開される。
+main に push すると CI がテストとビルドを通したあと、https://geigeki-kaiiki.masseater.dev/ （Cloudflare Workers の静的アセット、設定は `wrangler.jsonc`）へ自動で公開する。Cloudflare のトークンは `.github/scripts/cloudflare-token.sh` が GitHub OIDC で masseater.dev の credential broker（`https://credentials.masseater.dev/`）から1時間だけ借りる。このリポが借りられるのは masseater/masseater.dev の `apps/portfolio/credential-grants.ts` に `deploy` で載っているため。リポ名を変えたらそちらも直す。
 
 `pnpm build:artifact` で three まで焼き込んだ1枚のHTML（`dist-artifact/artifact.html`）ができる。これを claude.ai の Artifact「迎撃海域」（https://claude.ai/artifact/Tw7udF1aCJhs6U4Fq5KXMB）に `url` 指定で再公開すると、同じURLのまま更新される。
 

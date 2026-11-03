@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "balance": "vitest run test/balance.test.ts --reporter=verbose",
-    "check": "pnpm typecheck && pnpm test && pnpm build"
+    "check": "pnpm typecheck && pnpm test && pnpm build",
+    "deploy": "pnpm build && wrangler deploy"
   },
   "dependencies": {
     "three": "0.187.0"
@@ -23,6 +24,7 @@
     "typescript": "7.0.2",
     "vite": "8.3.5",
     "vite-plugin-singlefile": "2.3.4",
-    "vitest": "5.1.0"
+    "vitest": "5.1.0",
+    "wrangler": "4.156.2"
   }
 }
