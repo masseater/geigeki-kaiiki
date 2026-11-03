@@ -24,6 +24,8 @@
 
 ## 公開
 
+main に push すると GitHub Pages（https://masseater.github.io/geigeki-kaiiki/）へ自動で公開される。
+
 `pnpm build:artifact` で three まで焼き込んだ1枚のHTML（`dist-artifact/artifact.html`）ができる。これを claude.ai の Artifact「迎撃海域」（https://claude.ai/artifact/Tw7udF1aCJhs6U4Fq5KXMB）に `url` 指定で再公開すると、同じURLのまま更新される。
 
 ## 見た目を変えたとき
